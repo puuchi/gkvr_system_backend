@@ -1,6 +1,7 @@
 package com.scu.gkvr_system_backend.controller;
 
 import com.scu.gkvr_system_backend.pojo.User;
+import com.scu.gkvr_system_backend.pojo.UserScore;
 import com.scu.gkvr_system_backend.service.UserService;
 import com.scu.gkvr_system_backend.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,5 +41,17 @@ public class UserController {
             return Result.success("注册成功！");
         }
         return Result.fail("用户已存在");
+    }
+
+    @GetMapping("/score/get/{username}")
+    public Result<UserScore> saveScore(@PathVariable String username) {
+        UserScore userScore = userService.getScore(username);
+        return Result.success(userScore);
+    }
+
+    @PostMapping("/save/score")
+    public Result saveScore(@RequestBody UserScore userScore) {
+        userService.saveScore(userScore);
+        return Result.success("保存成功！");
     }
 }

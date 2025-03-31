@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.scu.gkvr_system_backend.mapper.UserMapper;
 import com.scu.gkvr_system_backend.pojo.User;
+import com.scu.gkvr_system_backend.pojo.UserScore;
 import com.scu.gkvr_system_backend.service.UserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -27,15 +29,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     public Boolean register(User user) {
-        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(User::getUsername, user.getUsername());
-        User registerUser = this.baseMapper.selectOne(wrapper);
+        User registerUser = getUserByUserName(user.getUsername());
         if (registerUser != null) {
             return false;
         } else {
             int rowsAffected = this.baseMapper.insert(user);
             return rowsAffected > 0;
         }
+    }
+
+    private User getUserByUserName(String userName) {
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getUsername, userName);
+        User registerUser = this.baseMapper.selectOne(wrapper);
+        return registerUser;
+    }
+
+    @Override
+    public void saveScore(UserScore userScore) {
+        User user = new User();
+        user.setId(getUserByUserName(userScore.getUsername()).getId());
+        BeanUtils.copyProperties(userScore, user);
+        this.baseMapper.updateById(user);
+    }
+
+    @Override
+    public UserScore getScore(String username) {
+        User user = getUserByUserName(username);
+        UserScore userScore = new UserScore();
+        BeanUtils.copyProperties(user, userScore);
+        return userScore;
     }
 }
 

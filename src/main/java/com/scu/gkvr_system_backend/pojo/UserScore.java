@@ -1,9 +1,6 @@
 package com.scu.gkvr_system_backend.pojo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serial;
@@ -12,15 +9,9 @@ import java.io.Serializable;
 /**
  * @TableName user
  */
-@TableName(value = "user")
 @Data
-public class User implements Serializable {
-    @TableId(type = IdType.AUTO)
-    private Integer id;
-
+public class UserScore implements Serializable {
     private String username;
-
-    private String password;
 
     private String province;
 
@@ -32,7 +23,6 @@ public class User implements Serializable {
 
     private String majorC;
 
-    @TableField("`rank`")
     private Integer rank;
 
     @Serial
