@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.scu.gkvr_system_backend.mapper.ScLiScoreMapper;
 import com.scu.gkvr_system_backend.mapper.ScoreRankMapper;
+import com.scu.gkvr_system_backend.pojo.GetRecoRequest;
 import com.scu.gkvr_system_backend.pojo.ScLiScore;
 import com.scu.gkvr_system_backend.pojo.ScoreRank;
 import com.scu.gkvr_system_backend.pojo.vo.ScLiScoreVo;
@@ -12,6 +13,8 @@ import com.scu.gkvr_system_backend.service.ScoreRankService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,33 +48,39 @@ public class ScoreRankServiceImpl extends ServiceImpl<ScoreRankMapper, ScoreRank
     }
 
     @Override
-    public Map<String, Object> getReco(int page, int score, String risk) {
+    public Map<String, Object> getReco(GetRecoRequest getRecoRequest) {
         LambdaQueryWrapper<ScoreRank> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(ScoreRank::getScore, score);
+        wrapper.eq(ScoreRank::getScore, getRecoRequest.getScore());
         ScoreRank scoreRank = this.baseMapper.selectOne(wrapper);
         Integer rank = scoreRank.getRank();//排名
         int UpperRank = (int) (rank * 0.6);
         int LowerRank = (int) (rank * 1.8);
-        switch (risk) {
+        switch (getRecoRequest.getRisk()) {
             //根据风险等级确定排名范围，阈值自由设置
             case "可冲击":
                 UpperRank = (int) (rank * 0.6);
-                LowerRank = (int) (rank * 0.9);
+                LowerRank = (int) (rank * 1.1);
                 break;
             case "较稳妥":
-                UpperRank = (int) (rank * 0.9);
-                LowerRank = (int) (rank * 1.2);
+                UpperRank = (int) (rank * 1.1);
+                LowerRank = (int) (rank * 1.4);
                 break;
             case "可保底":
-                UpperRank = (int) (rank * 1.2);
+                UpperRank = (int) (rank * 1.4);
                 LowerRank = (int) (rank * 1.8);
                 break;
             default:
                 break;
         }
-        List<ScLiScore> schools = scLiScoreMapper.selectRank(UpperRank, LowerRank);
+
+        List<ScLiScore> schools;
+        if (StringUtils.isEmpty(getRecoRequest.getProvince())) {
+            schools = scLiScoreMapper.selectRank(UpperRank, LowerRank);
+        } else {
+            schools = scLiScoreMapper.selectRankByProvince(UpperRank, LowerRank, getRecoRequest.getProvince());
+        }
         int total = schools.size();
-        int startIndex = (page - 1) * 10; //计算起始索引
+        int startIndex = (getRecoRequest.getPage() - 1) * 10; //计算起始索引
         int endIndex = Math.min(startIndex + 10, schools.size()); //计算结束索引（最多10个学校）
         schools = schools.subList(startIndex, endIndex); //分页
         List<Integer> averageScores = new ArrayList<>(); //平均分作为预测投档线
@@ -88,8 +97,11 @@ public class ScoreRankServiceImpl extends ServiceImpl<ScoreRankMapper, ScoreRank
             int UpLineRate = (int) (rankRate * 50) >= 100 ? 99 : (int) (rankRate * 50); //概率计算
             averageScores.add((int) averageScore);
             scLiScore.setUpLineRate(UpLineRate);
-            scLiScore.setMajorGroups(majorGroupScoreService.getMajorGroupVoBySchoolId(scLiScore.getSchoolId()));
+            scLiScore.setMajorGroups(majorGroupScoreService.getMajorGroupVoBySchoolId(scLiScore.getSchoolId(), getRecoRequest.getLikeMajorIds()));
         }
+        scLiScoreVos = scLiScoreVos.stream()
+                .filter(scLiScoreVo -> !CollectionUtils.isEmpty(scLiScoreVo.getMajorGroups()))
+                .toList();
         result.put("total", total);
         result.put("scoreRank", scoreRank);
         result.put("averageScores", averageScores);

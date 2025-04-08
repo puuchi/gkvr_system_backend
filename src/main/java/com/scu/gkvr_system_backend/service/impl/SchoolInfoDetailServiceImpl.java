@@ -46,7 +46,7 @@ public class SchoolInfoDetailServiceImpl extends ServiceImpl<SchoolInfoDetailMap
 
         LambdaQueryWrapper<ScLiScore> wrapper2 = new LambdaQueryWrapper<>();
         wrapper2.eq(ScLiScore::getSchoolId, schoolId);
-        ScLiScore scLiScore = this.scLiScoreMapper.selectOne(wrapper2);
+        ScLiScore scLiScore = this.scLiScoreMapper.selectList(wrapper2).get(0);
 
         LambdaQueryWrapper<MajorScore> wrapper3 = new LambdaQueryWrapper<>();
         wrapper3.eq(MajorScore::getSchoolId, schoolId);

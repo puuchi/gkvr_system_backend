@@ -1,6 +1,7 @@
 package com.scu.gkvr_system_backend.controller;
 
 import com.scu.gkvr_system_backend.pojo.MajorScore;
+import com.scu.gkvr_system_backend.pojo.vo.OptionVo;
 import com.scu.gkvr_system_backend.service.MajorInfoService;
 import com.scu.gkvr_system_backend.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,15 @@ public class MajorInfoController {
     public Result<Map<String, Object>> getSortedMajors(@RequestParam int page,
                                                        @RequestParam String type) {
         Map<String, Object> data = majorInfoService.getSortedMajors(page, type);
+        if (data != null) {
+            return Result.success(data);
+        }
+        return Result.fail("查询失败");
+    }
+
+    @GetMapping("/options")
+    public Result<List<OptionVo>> getSortedMajors() {
+        List<OptionVo> data = majorInfoService.getMajorOptions();
         if (data != null) {
             return Result.success(data);
         }

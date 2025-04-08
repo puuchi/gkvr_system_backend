@@ -7,6 +7,7 @@ import com.scu.gkvr_system_backend.mapper.MajorGroupMajorMapper;
 import com.scu.gkvr_system_backend.mapper.MajorInfoMapper;
 import com.scu.gkvr_system_backend.pojo.MajorInfo;
 import com.scu.gkvr_system_backend.pojo.MajorScore;
+import com.scu.gkvr_system_backend.pojo.vo.OptionVo;
 import com.scu.gkvr_system_backend.service.MajorInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,13 @@ public class MajorInfoServiceImpl extends ServiceImpl<MajorInfoMapper, MajorInfo
         result.put("majors", majorInfoPage.getRecords());
         result.put("total", majorInfoPage.getTotal());
         return result;
+    }
+
+    @Override
+    public List<OptionVo> getMajorOptions() {
+        LambdaQueryWrapper<MajorInfo> wrapper = new LambdaQueryWrapper<>();
+        return this.baseMapper.selectList(wrapper)
+                .stream().map((majorInfo) -> new OptionVo(majorInfo.getMajorId(), majorInfo.getMajorName())).toList();
     }
 
     @Override

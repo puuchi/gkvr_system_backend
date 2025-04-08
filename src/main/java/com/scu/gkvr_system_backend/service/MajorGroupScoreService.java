@@ -13,5 +13,5 @@ import java.util.List;
  */
 public interface MajorGroupScoreService extends IService<MajorGroupScore> {
 
-    List<MajorGroupScoreVo> getMajorGroupVoBySchoolId(Integer id);
+    List<MajorGroupScoreVo> getMajorGroupVoBySchoolId(Integer id, List<Integer> likeMajorIds);
 }

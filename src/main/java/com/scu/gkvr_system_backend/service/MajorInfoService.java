@@ -3,6 +3,7 @@ package com.scu.gkvr_system_backend.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.scu.gkvr_system_backend.pojo.MajorInfo;
 import com.scu.gkvr_system_backend.pojo.MajorScore;
+import com.scu.gkvr_system_backend.pojo.vo.OptionVo;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,8 @@ import java.util.Map;
 public interface MajorInfoService extends IService<MajorInfo> {
 
     Map<String, Object> getSortedMajors(int page, String type);
+
+    List<OptionVo> getMajorOptions();
 
     Map<String, Object> SearchByName(int page, String majorName);
 

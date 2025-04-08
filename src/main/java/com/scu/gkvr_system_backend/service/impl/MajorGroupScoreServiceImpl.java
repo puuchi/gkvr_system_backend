@@ -24,11 +24,8 @@ public class MajorGroupScoreServiceImpl extends ServiceImpl<MajorGroupScoreMappe
     private MajorGroupScoreMapper majorGroupScoreMapper;
 
     @Override
-    public List<MajorGroupScoreVo> getMajorGroupVoBySchoolId(Integer schoolId) {
-        LambdaQueryWrapper<MajorGroupScore> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(MajorGroupScore::getSchoolId, schoolId);
-
-       return majorGroupScoreMapper.selectBySchoolId(schoolId);
+    public List<MajorGroupScoreVo> getMajorGroupVoBySchoolId(Integer schoolId, List<Integer> likeMajorIds) {
+       return majorGroupScoreMapper.selectBySchoolId(schoolId, likeMajorIds);
     }
 }
 
