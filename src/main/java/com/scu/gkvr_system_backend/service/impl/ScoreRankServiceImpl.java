@@ -6,7 +6,10 @@ import com.scu.gkvr_system_backend.mapper.ScLiScoreMapper;
 import com.scu.gkvr_system_backend.mapper.ScoreRankMapper;
 import com.scu.gkvr_system_backend.pojo.ScLiScore;
 import com.scu.gkvr_system_backend.pojo.ScoreRank;
+import com.scu.gkvr_system_backend.pojo.vo.ScLiScoreVo;
+import com.scu.gkvr_system_backend.service.MajorGroupScoreService;
 import com.scu.gkvr_system_backend.service.ScoreRankService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +31,9 @@ public class ScoreRankServiceImpl extends ServiceImpl<ScoreRankMapper, ScoreRank
 
     @Autowired
     ScLiScoreMapper scLiScoreMapper;
+
+    @Autowired
+    MajorGroupScoreService majorGroupScoreService;
 
     @Override
     public Map<String, Object> getRank(int score) {
@@ -69,19 +75,25 @@ public class ScoreRankServiceImpl extends ServiceImpl<ScoreRankMapper, ScoreRank
         int endIndex = Math.min(startIndex + 10, schools.size()); //计算结束索引（最多10个学校）
         schools = schools.subList(startIndex, endIndex); //分页
         List<Integer> averageScores = new ArrayList<>(); //平均分作为预测投档线
-        List<Integer> upLineRateList = new ArrayList<>();
-        for (ScLiScore scLiScore : schools) {
+
+        List<ScLiScoreVo> scLiScoreVos = schools.stream().map(scLiScore -> {
+            ScLiScoreVo scLiScoreVo = new ScLiScoreVo();
+            BeanUtils.copyProperties(scLiScore, scLiScoreVo);
+            return scLiScoreVo;
+        }).toList();
+
+        for (ScLiScoreVo scLiScore : scLiScoreVos) {
             double averageScore = (scLiScore.getScore2020() + scLiScore.getScore2021() + scLiScore.getScore2022()) / 3.0;
             double rankRate = ((scLiScore.getRank2020() + scLiScore.getRank2021() + scLiScore.getRank2022()) / 3.0) / rank;
             int UpLineRate = (int) (rankRate * 50) >= 100 ? 99 : (int) (rankRate * 50); //概率计算
-            upLineRateList.add(UpLineRate);
             averageScores.add((int) averageScore);
+            scLiScore.setUpLineRate(UpLineRate);
+            scLiScore.setMajorGroups(majorGroupScoreService.getMajorGroupVoBySchoolId(scLiScore.getSchoolId()));
         }
         result.put("total", total);
         result.put("scoreRank", scoreRank);
-        result.put("upLineRateList", upLineRateList);
         result.put("averageScores", averageScores);
-        result.put("schools", schools);
+        result.put("schools", scLiScoreVos);
         return result;
     }
 }

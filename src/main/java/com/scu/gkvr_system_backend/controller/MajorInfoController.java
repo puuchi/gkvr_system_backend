@@ -1,10 +1,12 @@
 package com.scu.gkvr_system_backend.controller;
 
+import com.scu.gkvr_system_backend.pojo.MajorScore;
 import com.scu.gkvr_system_backend.service.MajorInfoService;
 import com.scu.gkvr_system_backend.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +39,15 @@ public class MajorInfoController {
     public Result<Map<String, Object>> majorSearchByName(@RequestParam int page,
                                                          @RequestParam String majorName) {
         Map<String, Object> data = majorInfoService.SearchByName(page, majorName);
+        if (data != null) {
+            return Result.success(data);
+        }
+        return Result.fail("查询失败");
+    }
+
+    @GetMapping("/list/{majorGroupId}")
+    public Result<List<MajorScore>> listByMajorGroupId(@PathVariable int majorGroupId) {
+        List<MajorScore> data = majorInfoService.listByMajorGroupId(majorGroupId);
         if (data != null) {
             return Result.success(data);
         }

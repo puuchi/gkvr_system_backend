@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.scu.gkvr_system_backend.mapper.UserMapper;
 import com.scu.gkvr_system_backend.pojo.User;
-import com.scu.gkvr_system_backend.pojo.UserScore;
+import com.scu.gkvr_system_backend.pojo.vo.UserScoreVo;
 import com.scu.gkvr_system_backend.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -46,19 +46,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public void saveScore(UserScore userScore) {
+    public void saveScore(UserScoreVo userScoreVo) {
         User user = new User();
-        user.setId(getUserByUserName(userScore.getUsername()).getId());
-        BeanUtils.copyProperties(userScore, user);
+        user.setId(getUserByUserName(userScoreVo.getUsername()).getId());
+        BeanUtils.copyProperties(userScoreVo, user);
         this.baseMapper.updateById(user);
     }
 
     @Override
-    public UserScore getScore(String username) {
+    public UserScoreVo getScore(String username) {
         User user = getUserByUserName(username);
-        UserScore userScore = new UserScore();
-        BeanUtils.copyProperties(user, userScore);
-        return userScore;
+        UserScoreVo userScoreVo = new UserScoreVo();
+        BeanUtils.copyProperties(user, userScoreVo);
+        return userScoreVo;
     }
 }
 

@@ -1,6 +1,5 @@
-package com.scu.gkvr_system_backend.pojo;
+package com.scu.gkvr_system_backend.pojo.vo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 import java.io.Serial;
@@ -10,7 +9,7 @@ import java.io.Serializable;
  * @TableName user
  */
 @Data
-public class UserScore implements Serializable {
+public class UserScoreVo implements Serializable {
     private String username;
 
     private String province;

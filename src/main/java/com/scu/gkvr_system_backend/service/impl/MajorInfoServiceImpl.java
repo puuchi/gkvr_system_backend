@@ -3,12 +3,16 @@ package com.scu.gkvr_system_backend.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.scu.gkvr_system_backend.mapper.MajorGroupMajorMapper;
 import com.scu.gkvr_system_backend.mapper.MajorInfoMapper;
 import com.scu.gkvr_system_backend.pojo.MajorInfo;
+import com.scu.gkvr_system_backend.pojo.MajorScore;
 import com.scu.gkvr_system_backend.service.MajorInfoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,6 +23,9 @@ import java.util.Map;
 @Service
 public class MajorInfoServiceImpl extends ServiceImpl<MajorInfoMapper, MajorInfo>
         implements MajorInfoService {
+
+    @Autowired
+    private MajorGroupMajorMapper majorGroupMajorMapper;
 
     private final Map<String, Object> result = new HashMap<>(); //结果集
 
@@ -41,6 +48,11 @@ public class MajorInfoServiceImpl extends ServiceImpl<MajorInfoMapper, MajorInfo
         result.put("majors", majorInfoPage.getRecords());
         result.put("total", majorInfoPage.getTotal());
         return result;
+    }
+
+    @Override
+    public List<MajorScore> listByMajorGroupId(int majorGroupId) {
+        return majorGroupMajorMapper.listByMajorGroupId(majorGroupId);
     }
 }
 
